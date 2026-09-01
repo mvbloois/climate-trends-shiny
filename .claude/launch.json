@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "climate-trends-shiny",
+      "runtimeExecutable": "Rscript",
+      "runtimeArgs": ["-e", "shiny::runApp('.', port=8321, host='127.0.0.1', launch.browser=FALSE)"],
+      "port": 8321
+    }
+  ]
+}
