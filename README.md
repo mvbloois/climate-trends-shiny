@@ -163,6 +163,14 @@ The filtered daily rows, and a download button for them.
 Aggregated and raw data can both be downloaded as CSV from their respective
 tabs; the trend plot can be downloaded as PNG.
 
+## Topics
+
+| | | | |
+|---|---|---|---|
+| `r` | `shiny` | `r-shiny` | `dashboard` |
+| `climate-data` | `climate-change` | `weather-data` | `knmi` |
+| `data-visualization` | `meteorology` | `ggplot2` | `time-series-analysis` |
+
 ## License
 
 [MIT](LICENSE)
