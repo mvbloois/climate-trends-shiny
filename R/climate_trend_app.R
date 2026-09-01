@@ -65,6 +65,29 @@ standardize_names <- function(df) {
   df
 }
 
+# Parse a date column that could already be Date/POSIXt, or character/numeric
+# in one of a few unambiguous (year-first) formats. Deliberately does NOT
+# attempt day-first or month-first formats (DD/MM/YYYY, MM/DD/YYYY) — those
+# are ambiguous with each other, and guessing wrong would silently produce
+# the wrong dates rather than an obvious failure.
+parse_flexible_date <- function(x) {
+  if (inherits(x, "Date")) return(x)
+  if (inherits(x, "POSIXt")) return(as.Date(x))
+  chr <- trimws(as.character(x))
+  formats <- c("%Y%m%d", "%Y-%m-%d", "%Y/%m/%d")
+  best <- NULL
+  best_na <- Inf
+  for (fmt in formats) {
+    parsed <- suppressWarnings(as.Date(chr, format = fmt))
+    n_na <- sum(is.na(parsed) & nzchar(chr))
+    if (n_na < best_na) {
+      best <- parsed
+      best_na <- n_na
+    }
+  }
+  best
+}
+
 # Replace configured sentinel values with real NA, across the measurement
 # columns only (never touches the date column).
 coerce_na <- function(df, na_strings) {
@@ -93,13 +116,10 @@ prepare_data <- function(df, divide_by_10 = FALSE) {
     stop("Could not find a yyyymmdd (or 'date') column in the data.")
   }
 
-  if (inherits(df$yyyymmdd, "Date")) {
-    df$date <- df$yyyymmdd
-  } else if (inherits(df$yyyymmdd, "POSIXt")) {
-    df$date <- as.Date(df$yyyymmdd)
-  } else {
-    date_chr <- trimws(as.character(df$yyyymmdd))
-    df$date <- as.Date(date_chr, format = "%Y%m%d")
+  df$date <- parse_flexible_date(df$yyyymmdd)
+  if (all(is.na(df$date))) {
+    stop("Could not parse any dates from the yyyymmdd/date column. Expected YYYYMMDD ",
+         "(e.g. 19000101), YYYY-MM-DD, or YYYY/MM/DD.")
   }
 
   meas_cols <- intersect(names(VAR_DEFS), names(df))

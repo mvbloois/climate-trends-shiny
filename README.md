@@ -2,8 +2,8 @@
 
 A Shiny app for exploring long-term trends in a daily climate record.
 
-**Live demo:** _TODO — not deployed yet. Once hosted (e.g. on
-[shinyapps.io](https://www.shinyapps.io/)), put the URL here._
+**Live demo:** [tabuladata.shinyapps.io/climate-trends-shiny](https://tabuladata.shinyapps.io/climate-trends-shiny/)
+(click "load demo data" to explore it right away, or upload your own CSV)
 
 | Tab | What it does |
 |-----|---------------|
