@@ -47,12 +47,17 @@ SEASON_TINTS  <- c(Winter = "#eaf3fb", Spring = "#eaf5ec", Summer = "#fdece0", A
 MONTH_SEASON <- c("Winter", "Winter", "Spring", "Spring", "Spring", "Summer",
                    "Summer", "Summer", "Autumn", "Autumn", "Autumn", "Winter")
 
+# na.rm=TRUE on a group that's entirely NA silently returns 0 for sum() (and
+# Inf/-Inf for min()/max()) instead of "no data" — e.g. a station that
+# didn't measure sunshine for its first 20 years would otherwise show up as
+# 20 years of exactly 0 sunshine hours rather than missing. Every stat here
+# returns NA when there's nothing to summarise.
 STAT_FUNS <- list(
-  mean   = function(x) mean(x, na.rm = TRUE),
-  sum    = function(x) sum(x, na.rm = TRUE),
-  min    = function(x) suppressWarnings(min(x, na.rm = TRUE)),
-  max    = function(x) suppressWarnings(max(x, na.rm = TRUE)),
-  median = function(x) median(x, na.rm = TRUE)
+  mean   = function(x) if (all(is.na(x))) NA_real_ else mean(x, na.rm = TRUE),
+  sum    = function(x) if (all(is.na(x))) NA_real_ else sum(x, na.rm = TRUE),
+  min    = function(x) if (all(is.na(x))) NA_real_ else suppressWarnings(min(x, na.rm = TRUE)),
+  max    = function(x) if (all(is.na(x))) NA_real_ else suppressWarnings(max(x, na.rm = TRUE)),
+  median = function(x) if (all(is.na(x))) NA_real_ else median(x, na.rm = TRUE)
 )
 
 # ---- Data preparation ---------------------------------------------------
@@ -1034,15 +1039,19 @@ climate_trend_app <- function(data = NULL) {
       d <- d[d$year >= input$year_range[1] & d$year <= input$year_range[2], , drop = FALSE]
       avail <- frost_ice_available()
 
+      # A year with zero observations for tn/tx (station didn't measure that
+      # year, or the whole year is filtered out) is "unknown", not "0 days".
+      count_or_na <- function(cond) if (all(is.na(cond))) NA_integer_ else sum(cond, na.rm = TRUE)
+
       frost <- if ("tn" %in% avail) {
         req(input$frost_t1)
-        d %>% group_by(year) %>% summarise(count = sum(tn < input$frost_t1, na.rm = TRUE), .groups = "drop") %>%
+        d %>% group_by(year) %>% summarise(count = count_or_na(tn < input$frost_t1), .groups = "drop") %>%
           mutate(type = "Frost days")
       } else NULL
 
       ice <- if ("tx" %in% avail) {
         req(input$ice_t1)
-        d %>% group_by(year) %>% summarise(count = sum(tx < input$ice_t1, na.rm = TRUE), .groups = "drop") %>%
+        d %>% group_by(year) %>% summarise(count = count_or_na(tx < input$ice_t1), .groups = "drop") %>%
           mutate(type = "Ice days")
       } else NULL
 
