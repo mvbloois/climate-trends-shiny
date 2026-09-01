@@ -1,5 +1,7 @@
 # Climate trends explorer
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A Shiny app for exploring long-term trends in a daily climate record.
 
 **Live demo:** [tabuladata.shinyapps.io/climate-trends-shiny](https://tabuladata.shinyapps.io/climate-trends-shiny/)
@@ -160,3 +162,7 @@ The filtered daily rows, and a download button for them.
 
 Aggregated and raw data can both be downloaded as CSV from their respective
 tabs; the trend plot can be downloaded as PNG.
+
+## License
+
+[MIT](LICENSE)
