@@ -13,11 +13,25 @@ library(tidyr)
 library(lubridate)
 library(scales)
 
+# The Cairo graphics device (Shiny's default when available, as it is on
+# shinyapps.io/Connect) hard-errors with "invalid 'width' argument" if a
+# plotOutput is measured before the browser has reported real pixel
+# dimensions back to the server — which can happen for a plot on the
+# tab that's active by default on first load. The base R PNG device
+# handles that same situation gracefully (a harmless warning instead of a
+# crash), so use it instead.
+options(shiny.usecairo = FALSE)
+
 has_DT <- requireNamespace("DT", quietly = TRUE)
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0 || is.na(a)) b else a
 
 # ---- Variable metadata -------------------------------------------------
+
+# KNMI stations offered directly in the app's "load from KNMI" picker.
+# fetch_knmi_daily() itself works with any KNMI station number; this list
+# is just the app's curated shortcut menu.
+KNMI_STATIONS <- c("De Bilt (260)" = "260", "Rotterdam Airport (344)" = "344")
 
 VAR_DEFS <- list(
   tg   = list(label = "Mean temperature (tg)", unit = "°C", default_stat = "mean"),
@@ -416,6 +430,11 @@ climate_trend_app <- function(data = NULL) {
                     accept = c(".csv", ".txt", "text/csv")),
           radioButtons("sep", "Column separator", choices = c("," = ",", ";" = ";", "tab" = "\t"), selected = ","),
           textInput("na_strings", "Treat these as missing (comma-separated)", value = "NA,-9999,-999"),
+          tags$hr(),
+          h5("Or load a KNMI station"),
+          selectInput("knmi_station", NULL, choices = KNMI_STATIONS),
+          actionButton("load_knmi", "Load from KNMI", class = "btn-secondary"),
+          tags$hr(),
           actionButton("demo", "Or load demo data", class = "btn-secondary"),
           tags$hr()
         ),
@@ -541,6 +560,18 @@ climate_trend_app <- function(data = NULL) {
         d <- coerce_na(standardize_names(d), strsplit(input$na_strings, ",")[[1]])
         raw_df(d)
       }
+    })
+
+    observeEvent(input$load_knmi, {
+      station <- input$knmi_station
+      id <- showNotification(paste0("Downloading KNMI station ", station, "..."),
+                              duration = NULL, type = "message")
+      on.exit(removeNotification(id), add = TRUE)
+      d <- tryCatch(fetch_knmi_daily(station), error = function(e) {
+        showNotification(paste("Could not download KNMI data:", conditionMessage(e)), type = "error", duration = 8)
+        NULL
+      })
+      if (!is.null(d)) raw_df(d)
     })
 
     observeEvent(input$demo, raw_df(make_demo_data()))
@@ -1195,6 +1226,14 @@ climate_trend_app <- function(data = NULL) {
     })
 
     output$dashboard_plot <- renderPlot({
+      # Dashboard is the default-active tab, so this is the one plot in the
+      # app whose very first render can happen before the browser has
+      # reported a real pixel width back to the server (every other plot is
+      # in a hidden tab and Shiny suspends it until that tab is shown, by
+      # which point the width is already known). Wait for a real width to
+      # avoid opening the graphics device with an invalid size.
+      w <- session$clientData$output_dashboard_plot_width
+      req(is.numeric(w), w > 0)
       s <- dashboard_series()
       req(nrow(s) > 0)
       ggplot(s, aes(x = year, y = value)) +

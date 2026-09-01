@@ -38,7 +38,11 @@ actually present in your data.frame.
 
 ## Using real KNMI daily data
 
-If you're pulling from KNMI (`etmgeg_<station>.zip`), watch out for two
+The easiest way: the app itself has a "Load a KNMI station" picker on the
+start screen (De Bilt 260, Rotterdam Airport 344) — pick one and click
+"Load from KNMI" to download and load it directly, no R code needed.
+
+For scripted use, or other stations, watch out for two
 naming traps: KNMI's own column called `RH` is **daily precipitation in mm**,
 not relative humidity — true mean relative humidity is a separate `UG`
 column that isn't in every station's daily export. And `SQ` (sunshine
