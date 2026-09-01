@@ -2,6 +2,9 @@
 
 A Shiny app for exploring long-term trends in a daily climate record.
 
+**Live demo:** _TODO — not deployed yet. Once hosted (e.g. on
+[shinyapps.io](https://www.shinyapps.io/)), put the URL here._
+
 | Tab | What it does |
 |-----|---------------|
 | [Dashboard](#tab-dashboard) | Overview: stat cards, all-indicators trend grid, full summary table |
