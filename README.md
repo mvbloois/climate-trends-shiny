@@ -1,6 +1,18 @@
 # Climate trends explorer
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![r](https://img.shields.io/badge/-r-blue)](https://github.com/topics/r)
+[![shiny](https://img.shields.io/badge/-shiny-blue)](https://github.com/topics/shiny)
+[![r-shiny](https://img.shields.io/badge/-r--shiny-blue)](https://github.com/topics/r-shiny)
+[![dashboard](https://img.shields.io/badge/-dashboard-blue)](https://github.com/topics/dashboard)
+[![climate-data](https://img.shields.io/badge/-climate--data-blue)](https://github.com/topics/climate-data)
+[![climate-change](https://img.shields.io/badge/-climate--change-blue)](https://github.com/topics/climate-change)
+[![weather-data](https://img.shields.io/badge/-weather--data-blue)](https://github.com/topics/weather-data)
+[![knmi](https://img.shields.io/badge/-knmi-blue)](https://github.com/topics/knmi)
+[![data-visualization](https://img.shields.io/badge/-data--visualization-blue)](https://github.com/topics/data-visualization)
+[![meteorology](https://img.shields.io/badge/-meteorology-blue)](https://github.com/topics/meteorology)
+[![ggplot2](https://img.shields.io/badge/-ggplot2-blue)](https://github.com/topics/ggplot2)
+[![time-series-analysis](https://img.shields.io/badge/-time--series--analysis-blue)](https://github.com/topics/time-series-analysis)
 
 A Shiny app for exploring long-term trends in a daily climate record.
 
